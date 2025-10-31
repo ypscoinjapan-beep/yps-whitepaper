@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YPS Whitepaper - The Future of Digital Currency</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <style>
+        :root {
+            --primary: #0a0e17;
+            --secondary: #1a2a3a;
+            --accent: #00c3ff;
+            --highlight: #ff6b00;
+            --success: #00ff88;
+            --text: #e0e0e0;
+            --light-bg: #121a24;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 195, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 0, 0.1) 0%, transparent 50%);
+        }
+        
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 195, 255, 0.3);
+        }
+        
+        .tagline {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 2.2rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--highlight));
+            border-radius: 2px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, var(--light-bg), #0d131d);
+            color: var(--text);
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--highlight));
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+        
+        .staking-card {
+            border-top: 4px solid var(--highlight);
+        }
+        
+        .staking-period {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .staking-return {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--highlight);
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #0088cc);
+            border: none;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 195, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0088cc, var(--accent));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 195, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--highlight), #cc5500);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #cc5500, var(--highlight));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+        }
+        
+        .roadmap-item {
+            position: relative;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, var(--light-bg), #0d131d);
+            border-radius: 12px;
+            border-left: 4px solid var(--highlight);
+        }
+        
+        .roadmap-item::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 2rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--highlight);
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+        
+        .token-distribution-container {
+            height: 500px;
+            position: relative;
+            margin: 2rem 0;
+        }
+        
+        .team-member {
+            text-align: center;
+            margin-bottom: 3rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+        
+        .team-photo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1.5rem;
+            border: 4px solid var(--accent);
+            box-shadow: 0 0 25px rgba(0, 195, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .team-member:hover .team-photo {
+            border-color: var(--highlight);
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.5);
+        }
+        
+        .download-section {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 2px solid var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .animation-container {
+            height: 400px;
+            margin: 3rem 0;
+            border-radius: 15px;
+            overflow: hidden;
+            background: linear-gradient(145deg, var(--light-bg), #0d131d);
+            border: 1px solid var(--secondary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .exchange-features {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            margin: 3rem 0;
+            border: 1px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .exchange-features::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,195,255,0.1) 0%, transparent 70%);
+            animation: pulse 8s infinite linear;
+        }
+        
+        @keyframes pulse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 2px solid var(--accent);
+        }
+        
+        .contract-address {
+            background: linear-gradient(145deg, var(--light-bg), #0d131d);
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: monospace;
+            border-left: 4px solid var(--highlight);
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .token-distribution-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .token-distribution-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--secondary);
+            position: relative;
+            padding-right: 60px;
+            font-size: 1.1rem;
+        }
+        
+        .distribution-percentage {
+            position: absolute;
+            right: 0;
+            font-weight: bold;
+            color: var(--highlight);
+            font-size: 1.3rem;
+        }
+        
+        .distribution-percentage::before {
+            content: '⟶';
+            margin-right: 10px;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .use-case-card {
+            text-align: center;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .use-case-card:hover {
+            background: linear-gradient(145deg, #1a2a3a, #0d131d);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .staking-card {
+                margin-bottom: 2rem;
+            }
+            
+            .team-member {
+                margin-bottom: 2rem;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="particle-container" id="header-particles"></div>
+        <div class="container text-center position-relative" style="z-index: 2;">
+            <div class="logo">YPS COIN</div>
+            <p class="tagline">Revolutionizing Global Payments with Blockchain Technology</p>
+            <p class="lead">The Future of Digital Currency - Spend YPS Anywhere in the World</p>
+            <div class="contract-address d-inline-block mt-3">
+                Contract: Coming Soon
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background-color: rgba(26, 42, 58, 0.95); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" style="color: var(--accent);">YPS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#abstract">Vision</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#staking">Staking</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tokenomics">Tokenomics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#usecases">Use Cases</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#roadmap">Roadmap</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#exchange">Exchange</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#download">Download</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <!-- Abstract Section -->
+        <section id="abstract" class="mb-5 py-5">
+            <h2 class="section-title text-center">Our Vision</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <p class="fs-5">YPS Coin is not just another cryptocurrency - it's a comprehensive financial ecosystem designed to revolutionize how people transact globally. Our vision is to create a borderless financial system where YPS becomes the preferred medium of exchange for everyday transactions.</p>
+                    <p class="fs-5">With our upcoming YPS ATM cards, global flight ticket booking system, and merchant adoption program, you'll be able to use YPS coins anywhere in the world instead of traditional dollars or local currencies.</p>
+                    <p class="fs-5">Imagine booking flights to Tokyo, shopping in Paris, or dining in New York - all with your YPS coins, enjoying zero foreign exchange fees and instant transactions.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="animation-container" id="vision-animation"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Staking Plans Section -->
+        <section id="staking" class="mb-5 py-5">
+            <h2 class="section-title text-center">High-Yield Staking Plans</h2>
+            <p class="text-center mb-5 fs-5">Maximize your returns with our industry-leading staking programs</p>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card staking-card text-center p-4 floating" style="animation-delay: 0s;">
+                        <div class="staking-period">30 Days</div>
+                        <div class="mb-2">VPS</div>
+                        <div class="staking-return">15%</div>
+                        <p class="my-3">Earn 15% return on your investment</p>
+                        <button class="btn btn-primary w-100">Select Plan</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card staking-card text-center p-4 floating" style="animation-delay: 0.5s;">
+                        <div class="staking-period">100 Days</div>
+                        <div class="mb-2">VPS</div>
+                        <div class="staking-return">45%</div>
+                        <p class="my-3">Earn 45% return on your investment</p>
+                        <button class="btn btn-primary w-100">Select Plan</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card staking-card text-center p-4 floating" style="animation-delay: 1s;">
+                        <div class="staking-period">200 Days</div>
+                        <div class="mb-2">VPS</div>
+                        <div class="staking-return">70%</div>
+                        <p class="my-3">Earn 70% return on your investment</p>
+                        <button class="btn btn-primary w-100">Select Plan</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card staking-card text-center p-4 floating" style="animation-delay: 1.5s;">
+                        <div class="staking-period">360 Days</div>
+                        <div class="mb-2">VPS</div>
+                        <div class="staking-return">100%</div>
+                        <p class="my-3">Earn 100% return on your investment</p>
+                        <button class="btn btn-primary w-100">Select Plan</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="animation-container mt-5" id="staking-animation"></div>
+        </section>
+
+        <!-- Tokenomics Section -->
+        <section id="tokenomics" class="mb-5 py-5">
+            <h2 class="section-title text-center">Token Economics</h2>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card p-5">
+                        <h4 class="mb-4">Token Details</h4>
+                        <ul class="list-unstyled fs-5">
+                            <li class="mb-3"><strong>Total Supply:</strong> 1.02 Billion YPS</li>
+                            <li class="mb-3"><strong>Token Name:</strong> YPS Coin</li>
+                            <li class="mb-3"><strong>Token Symbol:</strong> YPS</li>
+                            <li class="mb-3"><strong>Blockchain:</strong> Binance Smart Chain</li>
+                            <li class="mb-3"><strong>Contract Address:</strong> Coming Soon</li>
+                        </ul>
+                        
+                        <h5 class="mt-5 mb-4">Token Distribution</h5>
+                        <ul class="token-distribution-list">
+                            <li>Reserve <span class="distribution-percentage">73.7%</span></li>
+                            <li>Airdrop (Stakers) <span class="distribution-percentage">17.2%</span></li>
+                            <li>Community <span class="distribution-percentage">5%</span></li>
+                            <li>Partners <span class="distribution-percentage">4.1%</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="token-distribution-container" id="token-distribution"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section id="usecases" class="mb-5 py-5">
+            <h2 class="section-title text-center">Real-World Use Cases</h2>
+            <p class="text-center mb-5 fs-5">YPS Coin is designed for everyday use across multiple industries</p>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">💳</div>
+                        <h4>YPS ATM Cards</h4>
+                        <p>Withdraw local currency from ATMs worldwide using your YPS balance. No foreign transaction fees, real-time conversion rates.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">✈️</div>
+                        <h4>Flight Ticket Booking</h4>
+                        <p>Book flights with major airlines using YPS coins. Enjoy exclusive discounts and loyalty rewards for YPS holders.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">🛒</div>
+                        <h4>Global E-Commerce</h4>
+                        <p>Shop at thousands of online stores worldwide. YPS is accepted at major retailers and boutique shops alike.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">🏨</div>
+                        <h4>Hotel & Accommodation</h4>
+                        <p>Book hotels, resorts, and vacation rentals globally. Special YPS-only deals at premium properties.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">🍽️</div>
+                        <h4>Restaurants & Dining</h4>
+                        <p>Pay at restaurants worldwide. Our partnership with major food delivery platforms expands your options.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card use-case-card">
+                        <div class="feature-icon">🚗</div>
+                        <h4>Transport & Rideshare</h4>
+                        <p>Use YPS for ride-sharing, car rentals, and public transportation in supported cities globally.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="animation-container mt-5" id="usecase-animation"></div>
+        </section>
+
+        <!-- Roadmap Section -->
+        <section id="roadmap" class="mb-5 py-5">
+            <h2 class="section-title text-center">Project Roadmap</h2>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="roadmap-item">
+                        <h4 class="glow-text" style="color: var(--accent);">Q4 2025</h4>
+                        <ul class="fs-5">
+                            <li>Platform Launch & Initial Exchange Listing</li>
+                            <li>Initial Staking Program Release</li>
+                            <li>First 10,000 Users Onboarding</li>
+                            <li>Mobile Wallet Application Beta</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <h4 class="glow-text" style="color: var(--accent);">Q1 2026</h4>
+                        <ul class="fs-5">
+                            <li>Mobile App Public Release</li>
+                            <li>Advanced Trading Features Implementation</li>
+                            <li>Major Partnership Announcements</li>
+                            <li>YPS Merchant Program Launch</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="roadmap-item">
+                        <h4 class="glow-text" style="color: var(--accent);">Q2 2026</h4>
+                        <ul class="fs-5">
+                            <li>Cross-Chain Integration (Ethereum, Polygon)</li>
+                            <li>YPS ATM Card System Launch</li>
+                            <li>Global Marketplace Integration</li>
+                            <li>1 Million Users Milestone</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-item">
+                        <h4 class="glow-text" style="color: var(--accent);">Q3 2026</h4>
+                        <ul class="fs-5">
+                            <li>DeFi Ecosystem Expansion</li>
+                            <li>YPS Coin Mainnet Launch</li>
+                            <li>Global Expansion to 50+ Countries</li>
+                            <li>Flight & Hotel Booking Platform</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="animation-container mt-5" id="roadmap-animation"></div>
+        </section>
+
+        <!-- Exchange Section -->
+        <section id="exchange" class="mb-5 py-5">
+            <h2 class="section-title text-center">YPS Exchange</h2>
+            
+            <div class="exchange-features">
+                <div class="position-relative" style="z-index: 2;">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <h3>Listing Fee</h3>
+                            <p class="display-4 fw-bold">$100 USDT</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <h3>Payment Method</h3>
+                            <p class="fs-5">Automatically deducted from your connected wallet</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <h3>Listing Time</h3>
+                            <p class="fs-5">Instant after payment confirmation</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-secondary btn-lg px-5 py-3 fs-4">PAY $100 & LIST TOKEN</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h4 class="mb-4">Supported Trading Pairs</h4>
+                    <div class="card p-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <ul class="list-unstyled fs-5">
+                                    <li>BTC Bitcoin</li>
+                                    <li>ETH Ethereum</li>
+                                    <li>BNB Binance Coin</li>
+                                    <li>SOL Solana</li>
+                                    <li>XRP Ripple</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <ul class="list-unstyled fs-5">
+                                    <li>ADA Cardano</li>
+                                    <li>DOGE Dogecoin</li>
+                                    <li>TON Toncoin</li>
+                                    <li>DOT Polkadot</li>
+                                    <li>AVAX Avalanche</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <ul class="list-unstyled fs-5">
+                                    <li>LINK Chainlink</li>
+                                    <li>LTC Litecoin</li>
+                                    <li>BCH Bitcoin Cash</li>
+                                    <li>XLM Stellar</li>
+                                    <li>ATOM Cosmos</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3">
+                                <ul class="list-unstyled fs-5">
+                                    <li>XMR Monero</li>
+                                    <li>ETC Ethereum Classic</li>
+                                    <li>XTZ Tezos</li>
+                                    <li>EOS</li>
+                                    <li>AAVE Aave</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="animation-container mt-5" id="exchange-animation"></div>
+        </section>
+
+        <!-- Team Section -->
+        <section id="team" class="mb-5 py-5">
+            <h2 class="section-title text-center">Our Team</h2>
+            <p class="text-center mb-5 fs-5">Backed by industry experts and strategic partners including Rosneft</p>
+            
+            <div class="row">
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJ1c2luZXNzJTIwbWFufGVufDB8fDB8fHww&auto=format&fit=crop&w=200&q=60" alt="Yuki Tanaka" class="team-photo">
+                    <h4>Yuki Tanaka</h4>
+                    <p class="text-muted fs-5">CEO & Founder</p>
+                    <p>Blockchain expert with 10+ years in fintech and cryptocurrency development. Former executive at major Japanese financial institution.</p>
+                </div>
+                
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGJ1c2luZXNzJTIwbWFufGVufDB8fDB8fHww&auto=format&fit=crop&w=200&q=60" alt="Haruto Sato" class="team-photo">
+                    <h4>Haruto Sato</h4>
+                    <p class="text-muted fs-5">CTO</p>
+                    <p>Former lead developer at major Japanese exchange, specializing in security and scalability. PhD in Cryptography from Tokyo University.</p>
+                </div>
+                
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YnVzaW5lc3MlMjB3b21hbnxlbnwwfHwwfHx8MA==&auto=format&fit=crop&w=200&q=60" alt="Aiko Kobayashi" class="team-photo">
+                    <h4>Aiko Kobayashi</h4>
+                    <p class="text-muted fs-5">Head of Business Development</p>
+                    <p>Strategic partnerships expert with extensive experience in international finance. Former Director of Partnerships at global payment processor.</p>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGJ1c2luZXNzJTIwbWFufGVufDB8fDB8fHww&auto=format&fit=crop&w=200&q=60" alt="Kenji Mori" class="team-photo">
+                    <h4>Kenji Mori</h4>
+                    <p class="text-muted fs-5">Lead Blockchain Developer</p>
+                    <p>Smart contract specialist with contributions to multiple DeFi protocols. Previously worked on Ethereum scaling solutions.</p>
+                </div>
+                
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8YnVzaW5lc3MlMjB3b21hbnxlbnwwfHwwfHx8MA==&auto=format&fit=crop&w=200&q=60" alt="Sakura Matsumoto" class="team-photo">
+                    <h4>Sakura Matsumoto</h4>
+                    <p class="text-muted fs-5">Marketing Director</p>
+                    <p>Digital marketing strategist with focus on cryptocurrency community growth. Led successful campaigns for multiple blockchain projects.</p>
+                </div>
+                
+                <div class="col-md-4 team-member">
+                    <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YnVzaW5lc3MlMjBtYW58ZW58MHx8MHx8fDA=&auto=format&fit=crop&w=200&q=60" alt="Rosneft Partnership" class="team-photo">
+                    <h4>Rosneft Partnership</h4>
+                    <p class="text-muted fs-5">Strategic Partner</p>
+                    <p>One of Russia's largest companies providing strategic support, resources, and global business connections to expand YPS adoption.</p>
+                </div>
+            </div>
+            
+            <div class="animation-container mt-5" id="team-animation"></div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download" class="download-section">
+            <div class="container">
+                <h2 class="section-title text-center">Download Whitepaper</h2>
+                <p class="text-center mb-4 fs-5">Get the complete YPS Whitepaper in PDF format for detailed technical specifications and investment analysis.</p>
+                <button class="btn btn-primary btn-lg px-5 py-3 fs-4" onclick="downloadPDF()">Download PDF Whitepaper</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p class="fs-5">&copy; 2025 YPS Coin. All rights reserved.</p>
+            <p class="mb-0 fs-5">Binance Smart Chain • Contract: 0wa7cb3edbae09be4e67d6e85e47be471beafha86a</p>
+            <div class="mt-3">
+                <button class="btn btn-outline-light me-2">Twitter</button>
+                <button class="btn btn-outline-light me-2">Telegram</button>
+                <button class="btn btn-outline-light">Discord</button>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize 3D animations
+        function initAnimations() {
+            // Header particles animation
+            const particleScene = new THREE.Scene();
+            const particleCamera = new THREE.PerspectiveCamera(75, window.innerWidth / 200, 0.1, 1000);
+            const particleRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            particleRenderer.setSize(document.getElementById('header-particles').offsetWidth, document.getElementById('header-particles').offsetHeight);
+            document.getElementById('header-particles').appendChild(particleRenderer.domElement);
+            
+            const particles = new THREE.Group();
+            const particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const particleMaterial = new THREE.MeshBasicMaterial({ color: 0x00c3ff });
+            
+            for (let i = 0; i < 100; i++) {
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                particle.position.x = (Math.random() - 0.5) * 10;
+                particle.position.y = (Math.random() - 0.5) * 10;
+                particle.position.z = (Math.random() - 0.5) * 10;
+                particles.add(particle);
+            }
+            
+            particleScene.add(particles);
+            particleCamera.position.z = 5;
+            
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                particles.rotation.x += 0.001;
+                particles.rotation.y += 0.002;
+                particleRenderer.render(particleScene, particleCamera);
+            }
+            animateParticles();
+            
+            // Vision animation
+            const visionScene = new THREE.Scene();
+            const visionCamera = new THREE.PerspectiveCamera(75, document.getElementById('vision-animation').offsetWidth / document.getElementById('vision-animation').offsetHeight, 0.1, 1000);
+            const visionRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            visionRenderer.setSize(document.getElementById('vision-animation').offsetWidth, document.getElementById('vision-animation').offsetHeight);
+            document.getElementById('vision-animation').appendChild(visionRenderer.domElement);
+            
+            const globeGeometry = new THREE.SphereGeometry(2, 32, 32);
+            const globeMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00c3ff, 
+                wireframe: true,
+                transparent: true,
+                opacity: 0.7
+            });
+            const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+            visionScene.add(globe);
+            
+            // Add orbit rings
+            const ringGeometry = new THREE.TorusGeometry(3, 0.02, 16, 100);
+            const ringMaterial = new THREE.MeshBasicMaterial({ color: 0xff6b00 });
+            const ring1 = new THREE.Mesh(ringGeometry, ringMaterial);
+            ring1.rotation.x = Math.PI / 2;
+            visionScene.add(ring1);
+            
+            const ring2 = new THREE.Mesh(ringGeometry, ringMaterial);
+            ring2.rotation.y = Math.PI / 2;
+            visionScene.add(ring2);
+            
+            visionCamera.position.z = 8;
+            
+            function animateVision() {
+                requestAnimationFrame(animateVision);
+                globe.rotation.y += 0.01;
+                ring1.rotation.z += 0.005;
+                ring2.rotation.x += 0.005;
+                visionRenderer.render(visionScene, visionCamera);
+            }
+            animateVision();
+            
+            // Token distribution animation
+            const tokenScene = new THREE.Scene();
+            const tokenCamera = new THREE.PerspectiveCamera(75, document.getElementById('token-distribution').offsetWidth / document.getElementById('token-distribution').offsetHeight, 0.1, 1000);
+            const tokenRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            tokenRenderer.setSize(document.getElementById('token-distribution').offsetWidth, document.getElementById('token-distribution').offsetHeight);
+            document.getElementById('token-distribution').appendChild(tokenRenderer.domElement);
+            
+            // Create interactive pie chart
+            const segments = [
+                { percentage: 73.7, color: 0x00c3ff, label: 'Reserve' },
+                { percentage: 17.2, color: 0xff6b00, label: 'Airdrop (Stakers)' },
+                { percentage: 5, color: 0x00ff88, label: 'Community' },
+                { percentage: 4.1, color: 0x9b59b6, label: 'Partners' }
+            ];
+            
+            let startAngle = 0;
+            segments.forEach(segment => {
+                const angle = (segment.percentage / 100) * Math.PI * 2;
+                const geometry = new THREE.CylinderGeometry(3, 3, 1, 32, 1, false, startAngle, angle);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: segment.color,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const segmentMesh = new THREE.Mesh(geometry, material);
+                segmentMesh.rotation.x = Math.PI / 2;
+                segmentMesh.userData = { label: segment.label, percentage: segment.percentage };
+                tokenScene.add(segmentMesh);
+                startAngle += angle;
+            });
+            
+            tokenCamera.position.z = 8;
+            
+            const tokenControls = new THREE.OrbitControls(tokenCamera, tokenRenderer.domElement);
+            tokenControls.enableDamping = true;
+            tokenControls.dampingFactor = 0.05;
+            
+            function animateToken() {
+                requestAnimationFrame(animateToken);
+                tokenControls.update();
+                tokenRenderer.render(tokenScene, tokenCamera);
+            }
+            animateToken();
+            
+            // Use case animation
+            const usecaseScene = new THREE.Scene();
+            const usecaseCamera = new THREE.PerspectiveCamera(75, document.getElementById('usecase-animation').offsetWidth / document.getElementById('usecase-animation').offsetHeight, 0.1, 1000);
+            const usecaseRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            usecaseRenderer.setSize(document.getElementById('usecase-animation').offsetWidth, document.getElementById('usecase-animation').offsetHeight);
+            document.getElementById('usecase-animation').appendChild(usecaseRenderer.domElement);
+            
+            // Create floating cards representing use cases
+            const cardGeometry = new THREE.BoxGeometry(1, 0.2, 1.5);
+            const cardMaterials = [
+                new THREE.MeshBasicMaterial({ color: 0x00c3ff }),
+                new THREE.MeshBasicMaterial({ color: 0xff6b00 }),
+                new THREE.MeshBasicMaterial({ color: 0x00ff88 })
+            ];
+            
+            const cards = [];
+            for (let i = 0; i < 6; i++) {
+                const card = new THREE.Mesh(cardGeometry, cardMaterials[i % 3]);
+                card.position.x = (Math.random() - 0.5) * 8;
+                card.position.y = (Math.random() - 0.5) * 4;
+                card.position.z = (Math.random() - 0.5) * 8;
+                card.rotation.x = Math.random() * Math.PI;
+                card.rotation.y = Math.random() * Math.PI;
+                usecaseScene.add(card);
+                cards.push(card);
+            }
+            
+            usecaseCamera.position.z = 10;
+            
+            function animateUsecase() {
+                requestAnimationFrame(animateUsecase);
+                cards.forEach((card, index) => {
+                    card.rotation.x += 0.01;
+                    card.rotation.y += 0.01;
+                    card.position.y = Math.sin(Date.now() * 0.001 + index) * 0.5;
+                });
+                usecaseRenderer.render(usecaseScene, usecaseCamera);
+            }
+            animateUsecase();
+        }
+        
+        // Initialize animations when page loads
+        window.addEventListener('load', initAnimations);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            // In a real implementation, you would update camera aspect ratios and renderer sizes here
+        });
+        
+        // PDF download function
+        function downloadPDF() {
+            alert("Thank you for your interest in YPS Coin! The whitepaper PDF download will be available soon. For now, you can save this page as PDF using your browser's print function.");
+            // In a real implementation, you would link to an actual PDF file
+            // window.open('yps-whitepaper.pdf', '_blank');
+        }
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
